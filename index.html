@@ -66,6 +66,10 @@
         <button class="download-btn" onclick="downloadReport()">
             📸 Save Report as Image
         </button>
+        <button id="installAppBtn" class="main-btn verify-btn"
+            style="display:none; background:#10b981; margin-top:10px;">
+            📱 Install App on Mobile
+        </button>
 
         <div style="text-align:center; margin-top:10px; font-size:10px; color:#999;">
             List auto-resets everyday
@@ -83,15 +87,31 @@
             });
         }
 
-        // Optional: Custom Install Button Logic (Kyunki auto-prompt kabhi kabhi hide ho jata hai)
+        // Custom Install Button Logic
         let deferredPrompt;
+        const installBtn = document.getElementById('installAppBtn');
+
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent default mini-infobar
+            // Default popup ko roko
             e.preventDefault();
+            // Event ko save karo taaki baad me trigger kar sakein
             deferredPrompt = e;
-            // Yahan aap chaho toh ek custom button show kar sakte ho
-            // document.getElementById('installBtn').style.display = 'block';
-            console.log("Install prompt is ready! You can trigger it now.");
+            // Apna custom button show karo
+            installBtn.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt !== null) {
+                // Install popup show karo
+                deferredPrompt.prompt();
+                // User ke response ka wait karo (Install kiya ya Cancel)
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                    installBtn.style.display = 'none'; // Install hone ke baad button hide kar do
+                }
+                deferredPrompt = null;
+            }
         });
     </script>
 </body>
